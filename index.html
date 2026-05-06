@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram 登录验证</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 { color: #333; margin-bottom: 20px; }
+        #status { margin-top: 20px; color: #666; font-size: 14px; }
+        .loader {
+            display: none;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 2s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>游戏授权登录</h2>
+        
+        <script async 
+            src="https://telegram.org/js/telegram-widget.js?22" 
+            data-telegram-login="PPPoker.TGBot" 
+            data-size="large" 
+            data-radius="10"
+            data-onauth="onTelegramAuth(user)" 
+            data-request-access="write">
+        </script>
+
+        <div id="loader" class="loader"></div>
+        <div id="status">请点击上方按钮完成授权</div>
+    </div>
+
+    <script type="text/javascript">
+        function onTelegramAuth(user) {
+            document.getElementById('status').innerText = "授权成功，正在返回游戏...";
+            document.getElementById('loader').style.display = "block";
+
+            // 1. 将用户信息序列化为 JSON 字符串
+            const userData = JSON.stringify(user);
+            
+            // 2. 对数据进行编码，防止 URL 冲突
+            const encodedData = encodeURIComponent(userData);
+            
+            // 3. 构造 Deep Link 唤起 Unity App
+            // 最终格式：PPGame://openapp?data={"id":123,"first_name":"xxx",...}
+            const deepLink = "PPGame://openapp?data=" + encodedData;
+
+            console.log("跳转链接: ", deepLink);
+
+            // 4. 延迟一小会儿后跳转，确保用户能看到反馈
+            setTimeout(function() {
+                window.location.href = deepLink;
+            }, 500);
+        }
+    </script>
+</body>
+</html>
